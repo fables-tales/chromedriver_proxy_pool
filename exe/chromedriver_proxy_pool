@@ -1,0 +1,5 @@
+#!/usr/bin/env ruby
+
+require "chromedriver_proxy_pool"
+
+ChromedriverProxyPool.main
