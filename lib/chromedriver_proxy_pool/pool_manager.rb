@@ -23,8 +23,8 @@ module ChromedriverProxyPool
       acquired << driver
 
       {
-        :port    => driver.port
-        :success => true
+        :port    => driver.port,
+        :success => true,
       }
     end
 
@@ -34,7 +34,7 @@ module ChromedriverProxyPool
       drivers << driver
 
       {
-        :success => true
+        :success => true,
       }
     end
 
