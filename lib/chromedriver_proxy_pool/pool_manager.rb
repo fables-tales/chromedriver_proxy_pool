@@ -17,11 +17,14 @@ module ChromedriverProxyPool
     end
 
     def acquire
+      return { :success => false } if drivers.empty?
+
       driver = drivers.pop
       acquired << driver
 
       {
-        :port => driver.port
+        :port    => driver.port
+        :success => true
       }
     end
 
