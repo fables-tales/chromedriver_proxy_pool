@@ -1,46 +1,54 @@
 require "chromedriver_proxy_pool/driver_process"
+require "thread"
 
 module ChromedriverProxyPool
   class PoolManager
     def initialize
       @limit = 8
       @acquired = []
+      @lock = Mutex.new
 
       establish_drivers
     end
 
     def stats
-      {
-        :limit    => limit,
-        :acquired => acquired_count,
+      lock.synchronize {
+        {
+          :limit    => limit,
+          :acquired => acquired_count,
+        }
       }
     end
 
     def acquire
-      return { :success => false } if drivers.empty?
+      lock.synchronize {
+        return { :success => false } if drivers.empty?
 
-      driver = drivers.pop
-      acquired << driver
+        driver = drivers.pop
+        acquired << driver
 
-      {
-        :port    => driver.port,
-        :success => true,
+        {
+          :port    => driver.port,
+          :success => true,
+        }
       }
     end
 
     def release(port)
-      driver = acquired.find {|x| x.port == port}
-      acquired.delete(driver)
-      drivers << driver
+      lock.synchronize {
+        driver = acquired.find {|x| x.port == port}
+        acquired.delete(driver)
+        drivers << driver
 
-      {
-        :success => true,
+        {
+          :success => true,
+        }
       }
     end
 
     private
 
-    attr_reader :limit, :acquired, :drivers
+    attr_reader :limit, :acquired, :drivers, :lock
 
     def acquired_count
       @acquired.count
